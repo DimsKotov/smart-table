@@ -11,7 +11,7 @@ import { initPagination } from "./components/pagination.js";
 // @todo: подключение
 
 // Исходные данные используемые в render()
-const { data, ...indexes } = initData(sourceData);
+const api = initData(sourceData);
 
 /**
  * Сбор и обработка полей из таблицы
@@ -33,14 +33,17 @@ function collectState() {
  * Перерисовка состояния таблицы при любых изменениях
  * @param {HTMLButtonElement?} action
  */
-function render(action) {
+async function render(action) {
   let state = collectState(); // состояние полей из таблицы
-  let result = [...data]; // копируем для последующего изменения
+  let query = {}; // копируем для последующего изменения
   // @todo: использование
+  query = applyPagination(query, state, action);  
 
-  result = applyPagination(result, state, action);
+  //result = applyPagination(result, state, action); //
+  const { total, items } = await api.getRecords(query);  
+  updatePagination(total, query);  
 
-  sampleTable.render(result);
+  sampleTable.render(items);
 }
 
 const sampleTable = initTable(
@@ -55,7 +58,7 @@ const sampleTable = initTable(
 
 // @todo: инициализация
 
-const applyPagination = initPagination(
+const {applyPagination, updatePagination} = initPagination(
   sampleTable.pagination.elements,
   (el, page, isCurrent) => {
     const input = el.querySelector("input");
@@ -70,7 +73,11 @@ const applyPagination = initPagination(
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
 
-render();
+async function init() {
+  const indexes = await api.getIndexes()
+}
+
+init().then(render);
 
 const applySorting = initSorting([
   // Нам нужно передать сюда массив элементов, которые вызывают сортировку, чтобы изменять их визуальное представление
@@ -80,7 +87,7 @@ const applySorting = initSorting([
 
 result = applySorting(result, state, action);
 
-const applyFiltering = initFiltering(sampleTable.filter.elements, {
+//const applyFiltering = initFiltering(sampleTable.filter.elements, {
   // передаём элементы фильтра
-  searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
-});
+  //searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
+//});//
