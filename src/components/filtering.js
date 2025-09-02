@@ -1,8 +1,3 @@
-import { createComparison, defaultRules } from "../lib/compare.js";
-
-// @todo: #4.3 — настроить компаратор
-const compare = createComparison(defaultRules);
-
 export function initFiltering(elements) {
   const updateIndexes = (elements, indexes) => {
     Object.keys(indexes).forEach((elementName) => {
@@ -42,7 +37,7 @@ export function initFiltering(elements) {
         });
       });
 
-    // @todo: #4.5 — отфильтровать данные используя компаратор
+    // @todo: #4.5 — отфильтровать данные, используя компаратор
     const filter = {};
     Object.keys(elements).forEach((key) => {
       if (elements[key]) {
